@@ -2,69 +2,59 @@ package com.innawaylabs.android.popcornclub;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.TextView;
 
+import com.innawaylabs.android.popcornclub.utils.Constants;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 
-public class MainActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity {
+    private final String TAG = "POPCORN";
 
-    private static final String TAG = "POPCORN";
+    private final String TITLE = "title";
+    private final String OVERVIEW = "overview";
 
-    @BindView(R.id.rv_movies_list)
-    RecyclerView rvMoviesList;
+    private int movieId;
 
-    private ArrayList<MoviesListItem> movies;
-    private MoviesAdapter adapter;
-    private final String QUERY_RESULTS = "results";
+    @BindView(R.id.tv_movie_title)
+    TextView tvMovieTitle;
+
+    @BindView(R.id.tv_overview)
+    TextView tvOverview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_details);
 
         ButterKnife.bind(this);
 
-        movies = new ArrayList<>();
-        adapter = new MoviesAdapter(getApplicationContext(), movies);
-        fetchPopularMovies();
-        rvMoviesList.setAdapter(adapter);
-        rvMoviesList.setLayoutManager(
-                new GridLayoutManager(this,
-                        getResources().getInteger(R.integer.movie_list_preview_columns)));
+        this.movieId = getIntent().getIntExtra(Constants.MOVIE_ID, -1);
+        if (movieId != -1)
+            fetchMoviesDetails();
     }
 
     // Send out the network request
-    private void fetchPopularMovies() {
+    private void fetchMoviesDetails() {
         AsyncHttpClient client = new AsyncHttpClient();
 
         RequestParams params = new RequestParams();
         params.add(getString(R.string.tmdb_key_api_key), getString(R.string.tmdb_api_v3_key));
-        client.get(getString(R.string.tmdb_api_v3_url_prefix) + getString(R.string.tmdb_popular_movies_suffix),
+        client.get(getString(R.string.tmdb_api_v3_url_prefix) + movieId,
                 params,
                 new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        try {
-                            movies.addAll(
-                                    MoviesListItem.createMoviesList(
-                                            response.getJSONArray(QUERY_RESULTS)));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        adapter.notifyDataSetChanged();
+                        tvMovieTitle.setText(response.optString(TITLE));
+                        tvOverview.setText(response.optString(OVERVIEW));
                     }
 
                     @Override

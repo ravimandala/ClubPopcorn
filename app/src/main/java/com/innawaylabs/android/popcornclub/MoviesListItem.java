@@ -10,15 +10,18 @@ public class MoviesListItem {
     private final String POSTER_PATH = "poster_path";
     private final String MOVIE_ID = "id";
     private final String ADULT = "adult";
+    private final String TITLE = "title";
 
     String posterPath;
     int movieId;
     boolean adultRated;
+    String title;
 
     public MoviesListItem(JSONObject movieJson) {
         this.posterPath = movieJson.optString(POSTER_PATH);
         this.movieId = movieJson.optInt(MOVIE_ID);
         this.adultRated = movieJson.optBoolean(ADULT);
+        this.title = movieJson.optString(TITLE);
     }
 
     public String getPosterPath() {
@@ -31,6 +34,10 @@ public class MoviesListItem {
 
     public boolean isAdultRated() {
         return adultRated;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public static ArrayList<MoviesListItem> createMoviesList(JSONArray moviesListJson) {
