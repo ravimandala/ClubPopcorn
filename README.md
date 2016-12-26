@@ -16,12 +16,17 @@ Supported features:
 **Developed by:** [_Ravi Kumar Mandala_](https://github.com/ravimandala)
 
 **User Stories: v1.0**
-* [ ] Required: Display a grid of top movies (by images) based on popularity or rating.
+* [ ] Required: Display a grid of top movies posters sortable based on popularity or rating.
 * [ ] Required: User can tap on a movie to launch movie details screen with title, release date, movie poster, vote average, and plot synopsis.
 * [ ] Required: Network Manager - In a background thread, app queries the `/movie/popular` or `/movie/top_rated` API for the sort criteria specified in the settings menu.
 * [ ] Required: App conforms to common standards found in the [Android Nanodegree General Project Guidelines](http://udacity.github.io/android-nanodegree-guidelines/core.html).
 * [ ] Optional: Restore the data using onSaveInstanceState/onRestoreInstanceState.
 * [ ] Optional: Upload application to [TMDb app directory](https://www.themoviedb.org/account/ravimandala/api/directory).
+
+**Nitty-gritty**
+* [x] Use a StaggeredGridLayout with additional decorations.
+* [ ] Use ButterKnife for view injection.
+* [ ] Properly handle the absence of connectivity (Picasso would suffer silently otherwise).
 
 **User Stories: v2.0**
 * [ ] Required: Add more information to movie details view
