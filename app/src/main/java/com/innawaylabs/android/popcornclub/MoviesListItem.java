@@ -1,5 +1,7 @@
 package com.innawaylabs.android.popcornclub;
 
+import com.innawaylabs.android.popcornclub.utils.Constants;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -7,21 +9,16 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class MoviesListItem {
-    private final String POSTER_PATH = "poster_path";
-    private final String MOVIE_ID = "id";
-    private final String ADULT = "adult";
-    private final String TITLE = "title";
-
     String posterPath;
     int movieId;
     boolean adultRated;
     String title;
 
     public MoviesListItem(JSONObject movieJson) {
-        this.posterPath = movieJson.optString(POSTER_PATH);
-        this.movieId = movieJson.optInt(MOVIE_ID);
-        this.adultRated = movieJson.optBoolean(ADULT);
-        this.title = movieJson.optString(TITLE);
+        this.posterPath = movieJson.optString(Constants.POSTER_PATH);
+        this.movieId = movieJson.optInt(Constants.MOVIE_ID);
+        this.adultRated = movieJson.optBoolean(Constants.ADULT);
+        this.title = movieJson.optString(Constants.TITLE);
     }
 
     public String getPosterPath() {

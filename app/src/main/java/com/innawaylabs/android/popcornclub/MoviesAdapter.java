@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.innawaylabs.android.popcornclub.utils.Constants;
+import com.innawaylabs.android.popcornclub.utils.MovieUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -39,21 +40,17 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         final MoviesListItem moviesListItem = moviesList.get(position);
 
         Picasso.with(getContext())
-                .load(getFullPosterPath(moviesListItem.getPosterPath()))
+                .load(MovieUtils.getFullPosterPath(getContext(), moviesListItem.getPosterPath()))
                 .resize(246, 328)
                 .into(holder.ivMoviePoster);
         holder.ivMoviePoster.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), DetailsActivity.class);
-                intent.putExtra(Constants.MOVIE_ID, moviesListItem.getMovieId());
+                intent.putExtra(Constants.INTENT_MOVIE_ID, moviesListItem.getMovieId());
                 getContext().startActivity(intent);
             }
         });
-    }
-
-    private String getFullPosterPath(String posterPath) {
-        return context.getString(R.string.tmdb_poster_path_url_prefix) + posterPath;
     }
 
     @Override

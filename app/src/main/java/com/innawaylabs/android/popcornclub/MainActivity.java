@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.innawaylabs.android.popcornclub.utils.Constants;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -31,8 +32,9 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<MoviesListItem> movies;
     private MoviesAdapter adapter;
-    private final String QUERY_RESULTS = "results";
     private int currentList;
+
+    AsyncHttpClient client = new AsyncHttpClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +82,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchTopMovies(String moviesApiSuffix) {
-        AsyncHttpClient client = new AsyncHttpClient();
-
         RequestParams params = new RequestParams();
         params.add(getString(R.string.tmdb_key_api_key), getString(R.string.tmdb_api_v3_key));
         client.get(getString(R.string.tmdb_api_v3_url_prefix) + moviesApiSuffix,
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 movies.addAll(
                         MoviesListItem.createMoviesList(
-                                response.getJSONArray(QUERY_RESULTS)));
+                                response.getJSONArray(Constants.QUERY_RESULTS)));
             } catch (JSONException e) {
                 e.printStackTrace();
             }

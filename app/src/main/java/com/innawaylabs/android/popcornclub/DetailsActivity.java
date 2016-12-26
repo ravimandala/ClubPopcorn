@@ -3,12 +3,15 @@ package com.innawaylabs.android.popcornclub;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.innawaylabs.android.popcornclub.utils.Constants;
+import com.innawaylabs.android.popcornclub.utils.MovieUtils;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
@@ -19,9 +22,6 @@ import cz.msebera.android.httpclient.Header;
 public class DetailsActivity extends AppCompatActivity {
     private final String TAG = "POPCORN";
 
-    private final String TITLE = "title";
-    private final String OVERVIEW = "overview";
-
     private int movieId;
 
     @BindView(R.id.tv_movie_title)
@@ -30,6 +30,15 @@ public class DetailsActivity extends AppCompatActivity {
     @BindView(R.id.tv_overview)
     TextView tvOverview;
 
+    @BindView(R.id.iv_movie_poster)
+    ImageView ivMoviePoster;
+
+    @BindView(R.id.tv_release_year)
+    TextView tvReleaseYear;
+
+    @BindView(R.id.tv_movie_rating)
+    TextView tvMovieRating;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +46,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        this.movieId = getIntent().getIntExtra(Constants.MOVIE_ID, -1);
+        this.movieId = getIntent().getIntExtra(Constants.INTENT_MOVIE_ID, -1);
         if (movieId != -1)
             fetchMoviesDetails();
     }
@@ -53,8 +62,14 @@ public class DetailsActivity extends AppCompatActivity {
                 new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        tvMovieTitle.setText(response.optString(TITLE));
-                        tvOverview.setText(response.optString(OVERVIEW));
+                        tvMovieTitle.setText(response.optString(Constants.TITLE));
+                        Picasso.with(getApplicationContext())
+                                .load(MovieUtils.getFullPosterPath(getApplicationContext(), response.optString(Constants.POSTER_PATH)))
+                                .resize(246, 348)
+                                .into(ivMoviePoster);
+                        tvReleaseYear.setText(response.optString(Constants.RELEASE_DATE));
+                        tvMovieRating.setText(response.optString(Constants.VOTE_AVERAGE));
+                        tvOverview.setText(response.optString(Constants.OVERVIEW));
                     }
 
                     @Override
