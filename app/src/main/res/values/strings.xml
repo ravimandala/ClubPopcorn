@@ -7,4 +7,5 @@
     <string name="tmdb_key_api_key" translatable="false">api_key</string>
     <string name="menu_popular_movies">Popular</string>
     <string name="menu_top_rated_movies">Top Rated</string>
+    <string name="tmdb_key_page_key">page</string>
 </resources>

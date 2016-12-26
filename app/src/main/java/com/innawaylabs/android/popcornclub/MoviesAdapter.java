@@ -41,6 +41,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
         Picasso.with(getContext())
                 .load(MovieUtils.getFullPosterPath(getContext(), moviesListItem.getPosterPath()))
+                .placeholder(R.drawable.ic_placeholder)
+                .error(R.drawable.ic_error_placeholder)
                 .resize(246, 328)
                 .into(holder.ivMoviePoster);
         holder.ivMoviePoster.setOnClickListener(new View.OnClickListener() {

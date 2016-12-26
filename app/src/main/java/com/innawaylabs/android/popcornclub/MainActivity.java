@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<MoviesListItem> movies;
     private MoviesAdapter adapter;
     private int currentList;
+    private GridLayoutManager layoutManager;
+    private EndlessRecyclerViewScrollListener movieListScrollListener;
 
     AsyncHttpClient client = new AsyncHttpClient();
 
@@ -46,11 +48,19 @@ public class MainActivity extends AppCompatActivity {
         movies = new ArrayList<>();
         adapter = new MoviesAdapter(getApplicationContext(), movies);
         currentList = R.id.mi_top_rated_movies;
-        fetchTopMovies(getString(R.string.tmdb_top_rated_movies_suffix));
+        fetchTopMovies(1);
         rvMoviesList.setAdapter(adapter);
-        rvMoviesList.setLayoutManager(
-                new GridLayoutManager(this,
-                        getResources().getInteger(R.integer.movie_list_preview_columns)));
+        layoutManager = new GridLayoutManager(this,getResources().getInteger(R.integer.movie_list_preview_columns));
+        rvMoviesList.setLayoutManager(layoutManager);
+        movieListScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                fetchTopMovies(page + 1);
+            }
+        };
+        rvMoviesList.addOnScrollListener(movieListScrollListener);
     }
 
     @Override
@@ -69,30 +79,44 @@ public class MainActivity extends AppCompatActivity {
             case R.id.mi_popular_movies:
                 currentList = R.id.mi_popular_movies;
                 movies.clear();
-                fetchTopMovies(getString(R.string.tmdb_popular_movies_suffix));
+                adapter.notifyDataSetChanged();
+                movieListScrollListener.resetState();
+                fetchTopMovies(1);
                 return true;
             case R.id.mi_top_rated_movies:
                 currentList = R.id.mi_top_rated_movies;
-                movies.clear();
-                fetchTopMovies(getString(R.string.tmdb_top_rated_movies_suffix));
+                fetchTopMovies(1);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void fetchTopMovies(String moviesApiSuffix) {
+    private void fetchTopMovies(int page) {
         RequestParams params = new RequestParams();
         params.add(getString(R.string.tmdb_key_api_key), getString(R.string.tmdb_api_v3_key));
+        params.add(getString(R.string.tmdb_key_page_key), String.valueOf(page));
+
+        String moviesApiSuffix = (currentList == R.id.mi_top_rated_movies) ? getString(R.string.tmdb_top_rated_movies_suffix) : getString(R.string.tmdb_popular_movies_suffix);
         client.get(getString(R.string.tmdb_api_v3_url_prefix) + moviesApiSuffix,
                 params,
-                new TopMoviesResponseHandler());
+                new TopMoviesResponseHandler(page == 1));
     }
 
     private class TopMoviesResponseHandler extends JsonHttpResponseHandler {
+        private boolean clearAll;
+
+        public TopMoviesResponseHandler(boolean clearAll) {
+                this.clearAll = clearAll;
+        }
+
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             try {
+                if (clearAll) {
+                    movieListScrollListener.resetState();
+                    movies.clear();
+                }
                 movies.addAll(
                         MoviesListItem.createMoviesList(
                                 response.getJSONArray(Constants.QUERY_RESULTS)));
@@ -100,6 +124,12 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             adapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+            Log.d(TAG, "Http request failed with statusCode = " + statusCode + " and error: " + throwable.getMessage());
+            super.onFailure(statusCode, headers, throwable, errorResponse);
         }
 
         @Override
