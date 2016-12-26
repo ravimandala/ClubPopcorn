@@ -42,3 +42,4 @@ captures/
 # Miscellaneous files
 .DS_Store
 .externalNativeBuild
+configuration.xml
