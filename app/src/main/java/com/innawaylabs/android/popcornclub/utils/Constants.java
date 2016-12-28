@@ -12,4 +12,6 @@ public class Constants {
     public static final String OVERVIEW = "overview";
 
     public static final String QUERY_RESULTS = "results";
+
+    public static final String CURRENT_LIST = "current_movies_list";
 }
