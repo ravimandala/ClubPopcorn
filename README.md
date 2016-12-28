@@ -37,6 +37,8 @@ Roadmap features:
 * [x] Optimize the number of API calls.
 * [x] Avoid recreating activity on orientation and other simple config changes.
 * [ ] Properly handle the absence of connectivity (Picasso would suffer silently otherwise).
+* [ ] Use OkHttp/Gson for async network calls.
+* [ ] Instead of making API call for movie details, get it on first shot and pass Movie object around.
 
 **User Stories: v2.0**
 * [ ] Required: Add more information to movie details view
