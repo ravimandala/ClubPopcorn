@@ -46,6 +46,10 @@ public class DetailsActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        // Enabling the Up action button on details activity
+        if (getActionBar() != null) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         this.movieId = getIntent().getIntExtra(Constants.INTENT_MOVIE_ID, -1);
         if (movieId != -1)
             fetchMoviesDetails();
