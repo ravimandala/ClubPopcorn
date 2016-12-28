@@ -26,14 +26,19 @@ Roadmap features:
 * [x] Required: Network Manager - In a background thread, app queries the `/movie/popular` or `/movie/top_rated` API for the sort criteria specified in the settings menu.
 * [x] Required: App conforms to common standards found in the [Android Nanodegree General Project Guidelines](http://udacity.github.io/android-nanodegree-guidelines/core.html).
 * [x] Optional: Provide infinite scroll by loading multiple pages of search results.
-* [ ] Optional: Restore the data using onSaveInstanceState/onRestoreInstanceState using Parcelable objects.
+* [x] Optional: Restore the data using onSaveInstanceState/onRestoreInstanceState using Parcelable objects.
+* [x] Optional: Use different number of columns in portrait and landscape modes.
 * [ ] Optional: Upload application to [TMDb app directory](https://www.themoviedb.org/account/ravimandala/api/directory).
-* [ ] Optional: Tracate long titles with ellipsis at the end.
+* [ ] Optional: Truncate long titles with ellipsis at the end.
 
 **Nitty-gritty**
 * [x] Use a StaggeredGridLayout with additional decorations.
 * [x] Use ButterKnife for view injection.
+* [x] Optimize the number of API calls.
+* [x] Avoid recreating activity on orientation and other simple config changes.
 * [ ] Properly handle the absence of connectivity (Picasso would suffer silently otherwise).
+* [ ] Use OkHttp/Gson for async network calls.
+* [ ] Instead of making API call for movie details, get it on first shot and pass Movie object around.
 
 **User Stories: v2.0**
 * [ ] Required: Add more information to movie details view

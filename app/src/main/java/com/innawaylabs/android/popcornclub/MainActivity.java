@@ -1,5 +1,6 @@
 package com.innawaylabs.android.popcornclub;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -30,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.rv_movies_list)
     RecyclerView rvMoviesList;
 
-    private ArrayList<MoviesListItem> movies;
+    private ArrayList<MoviesListItem> topRatedMovies;
+    private ArrayList<MoviesListItem> popularMovies;
     private MoviesAdapter adapter;
     private int currentList;
     private GridLayoutManager layoutManager;
@@ -39,18 +41,39 @@ public class MainActivity extends AppCompatActivity {
     AsyncHttpClient client = new AsyncHttpClient();
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            layoutManager.setSpanCount(getResources().getInteger(R.integer.movie_list_portrait_columns));
+        } else {
+            layoutManager.setSpanCount(getResources().getInteger(R.integer.movie_list_landscape_columns));
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
 
-        movies = new ArrayList<>();
-        adapter = new MoviesAdapter(getApplicationContext(), movies);
-        currentList = R.id.mi_top_rated_movies;
+        if (savedInstanceState == null) {
+            currentList = R.id.mi_top_rated_movies;
+        } else {
+            currentList = savedInstanceState.getInt(Constants.CURRENT_LIST);
+        }
+        popularMovies = new ArrayList<>();
+        topRatedMovies = new ArrayList<>();
+        adapter = new MoviesAdapter(
+                getApplicationContext(),
+                (currentList == R.id.mi_top_rated_movies) ? topRatedMovies : popularMovies);
         fetchTopMovies(1);
         rvMoviesList.setAdapter(adapter);
-        layoutManager = new GridLayoutManager(this,getResources().getInteger(R.integer.movie_list_preview_columns));
+
+        int numColumns = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ?
+                getResources().getInteger(R.integer.movie_list_portrait_columns):
+                getResources().getInteger(R.integer.movie_list_landscape_columns);
+        layoutManager = new GridLayoutManager(this, numColumns);
         rvMoviesList.setLayoutManager(layoutManager);
         movieListScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
@@ -61,6 +84,12 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         rvMoviesList.addOnScrollListener(movieListScrollListener);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(Constants.CURRENT_LIST, currentList);
     }
 
     @Override
@@ -77,15 +106,15 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.mi_popular_movies:
-                currentList = R.id.mi_popular_movies;
-                movies.clear();
-                adapter.notifyDataSetChanged();
-                movieListScrollListener.resetState();
-                fetchTopMovies(1);
-                return true;
             case R.id.mi_top_rated_movies:
-                currentList = R.id.mi_top_rated_movies;
-                fetchTopMovies(1);
+                currentList = item.getItemId();
+                // Simply switch the lists and do not load more items yet.
+                adapter.setMoviesList(
+                        (item.getItemId() == R.id.mi_popular_movies) ? popularMovies : topRatedMovies);
+                if (adapter.getMoviesList().size() == 0)
+                    fetchTopMovies(1);
+                movieListScrollListener.resetState();
+                adapter.notifyDataSetChanged();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -97,27 +126,20 @@ public class MainActivity extends AppCompatActivity {
         params.add(getString(R.string.tmdb_key_api_key), getString(R.string.tmdb_api_v3_key));
         params.add(getString(R.string.tmdb_key_page_key), String.valueOf(page));
 
-        String moviesApiSuffix = (currentList == R.id.mi_top_rated_movies) ? getString(R.string.tmdb_top_rated_movies_suffix) : getString(R.string.tmdb_popular_movies_suffix);
+        String moviesApiSuffix =
+                (currentList == R.id.mi_top_rated_movies) ?
+                        getString(R.string.tmdb_top_rated_movies_suffix) :
+                        getString(R.string.tmdb_popular_movies_suffix);
         client.get(getString(R.string.tmdb_api_v3_url_prefix) + moviesApiSuffix,
                 params,
-                new TopMoviesResponseHandler(page == 1));
+                new TopMoviesResponseHandler());
     }
 
     private class TopMoviesResponseHandler extends JsonHttpResponseHandler {
-        private boolean clearAll;
-
-        public TopMoviesResponseHandler(boolean clearAll) {
-                this.clearAll = clearAll;
-        }
-
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             try {
-                if (clearAll) {
-                    movieListScrollListener.resetState();
-                    movies.clear();
-                }
-                movies.addAll(
+                adapter.getMoviesList().addAll(
                         MoviesListItem.createMoviesList(
                                 response.getJSONArray(Constants.QUERY_RESULTS)));
             } catch (JSONException e) {

@@ -3,4 +3,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="photos_list_spacing">12dp</dimen>
+    <dimen name="details_poster_width">246dp</dimen>
+    <dimen name="details_poster_height">328dp</dimen>
+    <dimen name="normal_text_size">16sp</dimen>
+    <dimen name="text_view_margin">6dp</dimen>
 </resources>
