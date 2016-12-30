@@ -26,8 +26,11 @@ Roadmap features:
 * [x] Required: Network Manager - In a background thread, app queries the `/movie/popular` or `/movie/top_rated` API for the sort criteria specified in the settings menu.
 * [x] Required: App conforms to common standards found in the [Android Nanodegree General Project Guidelines](http://udacity.github.io/android-nanodegree-guidelines/core.html).
 * [x] Optional: Provide infinite scroll by loading multiple pages of search results.
-* [x] Optional: Restore the data using onSaveInstanceState/onRestoreInstanceState using Parcelable objects.
 * [x] Optional: Use different number of columns in portrait and landscape modes.
+* [x] Optional: Preserve the list of popular and top_rated movies instead of redundantly fetching them.
+* [x] Optional: Use OkHttp for smooth network communications.
+* [ ] Optional: Use Gson library for better handling JSON responses.
+* [ ] Optional: Restore the data using onSaveInstanceState/onRestoreInstanceState using Parcelable objects.
 * [ ] Optional: Upload application to [TMDb app directory](https://www.themoviedb.org/account/ravimandala/api/directory).
 * [ ] Optional: Truncate long titles with ellipsis at the end.
 

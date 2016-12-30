@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Popcorn Club</string>
-    <string name="tmdb_poster_path_url_prefix" translatable="false">http://image.tmdb.org/t/p/w185/</string>
-    <string name="tmdb_api_v3_url_prefix">https://api.themoviedb.org/3/movie/</string>
-    <string name="tmdb_popular_movies_suffix" translatable="false">/popular/</string>
-    <string name="tmdb_top_rated_movies_suffix" translatable="false">/top_rated/</string>
+    <string name="tmdb_poster_path_url_prefix" translatable="false">https://image.tmdb.org/t/p/w185/</string>
+    <string name="tmdb_api_v3_url_prefix">https://api.themoviedb.org/3/movie</string>
+    <string name="tmdb_popular_movies_suffix" translatable="false">popular</string>
+    <string name="tmdb_top_rated_movies_suffix" translatable="false">top_rated</string>
     <string name="tmdb_key_api_key" translatable="false">api_key</string>
     <string name="menu_popular_movies">Popular</string>
     <string name="menu_top_rated_movies">Top Rated</string>

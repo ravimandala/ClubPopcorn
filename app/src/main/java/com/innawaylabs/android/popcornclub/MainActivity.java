@@ -11,34 +11,36 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.innawaylabs.android.popcornclub.utils.Constants;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cz.msebera.android.httpclient.Header;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final String TAG = "POPCORN";
+    private static final String TAG = "TopMovies";
 
     @BindView(R.id.rv_movies_list)
     RecyclerView rvMoviesList;
 
-    private ArrayList<MoviesListItem> topRatedMovies;
-    private ArrayList<MoviesListItem> popularMovies;
+    private ArrayList<Movie> topRatedMovies;
+    private ArrayList<Movie> popularMovies;
     private MoviesAdapter adapter;
     private int currentList;
     private GridLayoutManager layoutManager;
     private EndlessRecyclerViewScrollListener movieListScrollListener;
 
-    AsyncHttpClient client = new AsyncHttpClient();
+    OkHttpClient client = new OkHttpClient();
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 getResources().getInteger(R.integer.movie_list_landscape_columns);
         layoutManager = new GridLayoutManager(this, numColumns);
         rvMoviesList.setLayoutManager(layoutManager);
-        movieListScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+        movieListScrollListener = new EndlessRecyclerViewScrollListener(getApplicationContext(), layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 // Triggered only when new data needs to be appended to the list
@@ -122,42 +124,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchTopMovies(int page) {
-        RequestParams params = new RequestParams();
-        params.add(getString(R.string.tmdb_key_api_key), getString(R.string.tmdb_api_v3_key));
-        params.add(getString(R.string.tmdb_key_page_key), String.valueOf(page));
-
         String moviesApiSuffix =
                 (currentList == R.id.mi_top_rated_movies) ?
                         getString(R.string.tmdb_top_rated_movies_suffix) :
                         getString(R.string.tmdb_popular_movies_suffix);
-        client.get(getString(R.string.tmdb_api_v3_url_prefix) + moviesApiSuffix,
-                params,
-                new TopMoviesResponseHandler());
-    }
 
-    private class TopMoviesResponseHandler extends JsonHttpResponseHandler {
-        @Override
-        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-            try {
-                adapter.getMoviesList().addAll(
-                        MoviesListItem.createMoviesList(
-                                response.getJSONArray(Constants.QUERY_RESULTS)));
-            } catch (JSONException e) {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(getString(R.string.tmdb_api_v3_url_prefix)).newBuilder();
+        urlBuilder.addPathSegment(moviesApiSuffix);
+        urlBuilder.addQueryParameter(getString(R.string.tmdb_key_api_key), getString(R.string.tmdb_api_v3_key));
+        urlBuilder.addQueryParameter(getString(R.string.tmdb_key_page_key), String.valueOf(page));
+        Log.d(TAG, "URL built: " + urlBuilder.build().toString());
+        Request request = new Request.Builder().url(urlBuilder.build()).build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, "API request failed: " + e.getMessage());
                 e.printStackTrace();
             }
-            adapter.notifyDataSetChanged();
-        }
 
-        @Override
-        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-            Log.d(TAG, "Http request failed with statusCode = " + statusCode + " and error: " + throwable.getMessage());
-            super.onFailure(statusCode, headers, throwable, errorResponse);
-        }
-
-        @Override
-        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-            Log.d(TAG, "Http request failed with statusCode = " + statusCode + " and error: " + throwable.getMessage());
-            super.onFailure(statusCode, headers, responseString, throwable);
-        }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String result = response.body().string();
+                    try {
+                        JSONObject jsonResult = new JSONObject(result);
+                        adapter.getMoviesList().addAll(
+                                Movie.createMoviesList(
+                                        jsonResult.getJSONArray(Constants.QUERY_RESULTS)));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    MainActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                } else {
+                    Log.w(TAG, "Got an unsuccessful response: " + response);
+                }
+            }
+        });
     }
 }

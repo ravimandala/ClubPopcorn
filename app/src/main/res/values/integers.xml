@@ -2,4 +2,5 @@
 <resources>
     <integer name="movie_list_portrait_columns">4</integer>
     <integer name="movie_list_landscape_columns">6</integer>
+    <integer name="results_per_page">20</integer>
 </resources>

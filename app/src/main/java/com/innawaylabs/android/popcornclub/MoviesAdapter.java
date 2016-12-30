@@ -16,18 +16,18 @@ import java.util.List;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder> {
     private final Context context;
-    private List<MoviesListItem> moviesList;
+    private List<Movie> moviesList;
 
-    public MoviesAdapter(Context context, List<MoviesListItem> moviesList) {
+    public MoviesAdapter(Context context, List<Movie> moviesList) {
         this.context = context;
         this.moviesList = moviesList;
     }
 
-    public void setMoviesList(List<MoviesListItem> moviesList) {
+    public void setMoviesList(List<Movie> moviesList) {
         this.moviesList = moviesList;
     }
 
-    public List<MoviesListItem> getMoviesList() {
+    public List<Movie> getMoviesList() {
         return moviesList;
     }
 
@@ -45,10 +45,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final MoviesListItem moviesListItem = moviesList.get(position);
+        final Movie movie = moviesList.get(position);
 
         Picasso.with(getContext())
-                .load(MovieUtils.getFullPosterPath(getContext(), moviesListItem.getPosterPath()))
+                .load(MovieUtils.getFullPosterPath(getContext(), movie.getPosterPath()))
                 .placeholder(R.drawable.ic_placeholder)
                 .error(R.drawable.ic_error_placeholder)
                 .resize(246, 328)
@@ -57,7 +57,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), DetailsActivity.class);
-                intent.putExtra(Constants.INTENT_MOVIE_ID, moviesListItem.getMovieId());
+                intent.putExtra(Constants.INTENT_MOVIE_ID, movie.getMovieId());
                 getContext().startActivity(intent);
             }
         });
