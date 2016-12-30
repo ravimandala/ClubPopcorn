@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Pelala Clubbu</string>
+    <string name="app_name">పేలాల క్లబ్</string>
+    <string name="menu_popular_movies">ప్రఖ్యాతిగాంచిన</string>
+    <string name="menu_top_rated_movies">టాప్ రేటింగ్</string>
 </resources>

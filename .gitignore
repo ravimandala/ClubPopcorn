@@ -43,3 +43,5 @@ captures/
 .DS_Store
 .externalNativeBuild
 configuration.xml
+
+keystore.properties
