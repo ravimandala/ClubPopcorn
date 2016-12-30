@@ -1,5 +1,6 @@
 package com.innawaylabs.android.popcornclub;
 
+import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,17 +20,21 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
     private int startingPageIndex = 0;
 
     RecyclerView.LayoutManager mLayoutManager;
+    Context mContext;
 
-    public EndlessRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
+    public EndlessRecyclerViewScrollListener(Context context, LinearLayoutManager layoutManager) {
+        this.mContext = context;
         this.mLayoutManager = layoutManager;
     }
 
-    public EndlessRecyclerViewScrollListener(GridLayoutManager layoutManager) {
+    public EndlessRecyclerViewScrollListener(Context context, GridLayoutManager layoutManager) {
+        this.mContext = context;
         this.mLayoutManager = layoutManager;
         visibleThreshold = visibleThreshold * layoutManager.getSpanCount();
     }
 
-    public EndlessRecyclerViewScrollListener(StaggeredGridLayoutManager layoutManager) {
+    public EndlessRecyclerViewScrollListener(Context context, StaggeredGridLayoutManager layoutManager) {
+        this.mContext = context;
         this.mLayoutManager = layoutManager;
         visibleThreshold = visibleThreshold * layoutManager.getSpanCount();
     }
@@ -87,7 +92,7 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
         // If we do need to reload some more data, we execute onLoadMore to fetch the data.
         // threshold should reflect how many total columns there are too
         if (!loading && (lastVisibleItemPosition + visibleThreshold) > totalItemCount) {
-            currentPage++;
+            currentPage = totalItemCount / mContext.getResources().getInteger(R.integer.results_per_page);
             onLoadMore(currentPage, totalItemCount, view);
             loading = true;
         }
@@ -102,5 +107,4 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
 
     // Defines the process for actually loading more data based on page
     public abstract void onLoadMore(int page, int totalItemsCount, RecyclerView view);
-
 }
